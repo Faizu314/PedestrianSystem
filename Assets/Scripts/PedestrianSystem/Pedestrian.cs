@@ -6,16 +6,17 @@ namespace PedestrianSystem {
 
     public class Pedestrian : MonoBehaviour {
 
-        [SerializeField] private AIPath m_AiPath;
         [SerializeField] private float m_WanderRadius;
         [SerializeField] private Transform m_DestDebug;
 
+        private IAstarAI m_Ai;
         private AstarPath m_AstarPath;
         private NNConstraint m_NnConstraint = NNConstraint.Walkable;
         private Coroutine m_BehaviourCo;
 
         public virtual void Initialize(PedestrianSpawner spawner) {
             m_AstarPath = AstarPath.active;
+            m_Ai = GetComponent<IAstarAI>();
         }
 
         public virtual void OnSpawned() {
@@ -33,15 +34,17 @@ namespace PedestrianSystem {
             var randDest = transform.position + randOffset;
 
             var randDestInfo = m_AstarPath.GetNearest(randDest, m_NnConstraint);
-            m_AiPath.destination = randDestInfo.position;
-            m_DestDebug.position = randDestInfo.position;
+            m_Ai.destination = randDestInfo.position;
         }
 
         private IEnumerator BehaviourCoroutine() {
             while (true) {
-                if (m_AiPath.reachedDestination)
+                if (m_Ai.reachedDestination)
                     SetRandomDestination();
-                
+
+                if (m_DestDebug != null)
+                    m_DestDebug.position = m_Ai.destination;
+
                 yield return null;
             }
         }

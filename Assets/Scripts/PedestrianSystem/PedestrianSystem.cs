@@ -10,7 +10,7 @@ namespace PedestrianSystem {
         [SerializeField] private float m_DespawnZoneRadius;
 
         private void Start() {
-            CircleXzZone zone = new(m_SpawnZoneRadius, m_DespawnZoneRadius);
+            CircleXzZone zone = new(m_SpawnZoneRadius, m_DespawnZoneRadius, AstarPath.active);
 
             m_PedestrianSpawner.Initialize(Camera.main, new ISpawnZone[] { zone }, new IDespawnZone[] { zone });
         }
