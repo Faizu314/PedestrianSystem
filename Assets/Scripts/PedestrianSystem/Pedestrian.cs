@@ -7,6 +7,8 @@ namespace PedestrianSystem {
     public class Pedestrian : MonoBehaviour {
 
         [SerializeField] private float m_WanderRadius;
+        [SerializeField] private Animator m_Animator;
+        [SerializeField] private float m_DefaultAnimatorSpeedMultiplier = 0.25f;
         [SerializeField] private Transform m_DestDebug;
 
         private IAstarAI m_Ai;
@@ -42,6 +44,12 @@ namespace PedestrianSystem {
                 if (m_Ai.reachedDestination)
                     SetRandomDestination();
 
+                var vel = m_Ai.velocity;
+                vel.y = 0f;
+                float speedNormalized = Mathf.Clamp(vel.magnitude, 0f, m_Ai.maxSpeed) / m_Ai.maxSpeed;
+
+                m_Animator.SetFloat("Speed", speedNormalized * m_DefaultAnimatorSpeedMultiplier);
+                    
                 if (m_DestDebug != null)
                     m_DestDebug.position = m_Ai.destination;
 
