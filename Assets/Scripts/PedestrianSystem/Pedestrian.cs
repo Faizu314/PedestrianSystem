@@ -11,12 +11,18 @@ namespace PedestrianSystem {
         [SerializeField] private float m_DefaultAnimatorSpeedMultiplier = 0.25f;
         [SerializeField] private Transform m_DestDebug;
 
+        public Bounds Bounds;
+        public bool IsVisible;
+        public virtual bool ShouldDespawn => false;
+
         private IAstarAI m_Ai;
         private AstarPath m_AstarPath;
-        private NNConstraint m_NnConstraint = NNConstraint.Walkable;
+        private PedestrianSpawner m_Spawner;
+        private NNConstraint m_DestConstraint = NNConstraint.Walkable;
         private Coroutine m_BehaviourCo;
 
         public virtual void Initialize(PedestrianSpawner spawner) {
+            m_Spawner = spawner;
             m_AstarPath = AstarPath.active;
             m_Ai = GetComponent<IAstarAI>();
         }
@@ -35,7 +41,7 @@ namespace PedestrianSystem {
             var randOffset = new Vector3(Mathf.Cos(randAngle), 0f, Mathf.Sin(randAngle)) * m_WanderRadius;
             var randDest = transform.position + randOffset;
 
-            var randDestInfo = m_AstarPath.GetNearest(randDest, m_NnConstraint);
+            var randDestInfo = m_AstarPath.GetNearest(randDest, m_DestConstraint);
             m_Ai.destination = randDestInfo.position;
         }
 

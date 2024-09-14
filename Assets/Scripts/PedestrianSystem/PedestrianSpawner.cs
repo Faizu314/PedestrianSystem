@@ -17,6 +17,8 @@ namespace PedestrianSystem {
         private ObjectPool<Pedestrian> m_PedestrianPool;
         private List<Pedestrian> m_ActivePedestrians = new();
 
+        public IReadOnlyList<Pedestrian> ActivePedestrians => m_ActivePedestrians;
+
         public void Initialize(Camera camera, ISpawnZone[] spawnZones, IDespawnZone[] despawnZones) {
             m_Camera = camera;
             m_SpawnZones = spawnZones;
@@ -55,13 +57,20 @@ namespace PedestrianSystem {
             while (true) {
 
                 foreach (var ped in m_ActivePedestrians) {
+                    bool inDespawnZone = false;
+
                     foreach (var despawnZone in m_DespawnZones) {
                         if (despawnZone.IsPointInZone(m_Camera, ped.transform.position)) {
-                            ped.OnDespawned();
-                            m_PedestrianPool.Release(ped);
-                            temp.Add(ped);
+                            inDespawnZone = true;
                             break;
                         }
+                    }
+
+                    if (inDespawnZone || ped.ShouldDespawn)
+                    {
+                        ped.OnDespawned();
+                        m_PedestrianPool.Release(ped);
+                        temp.Add(ped);
                     }
                 }
 
@@ -87,5 +96,6 @@ namespace PedestrianSystem {
                 yield return null;
             }
         }
-    } 
+    }
+    
 }
